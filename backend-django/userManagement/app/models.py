@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 # Create your models here.
+from django.contrib.auth.hashers import make_password
 
 class State(models.Model):
     name = models.CharField(max_length=50)
@@ -22,9 +23,16 @@ class User(models.Model):
     dateOfBirth = models.DateField(null=True,blank=True)
     role = models.CharField(max_length=50,default='user')
     email = models.EmailField(max_length=254)
-    passwrord = models.CharField(max_length=254)
+    password = models.CharField(max_length=254)
     is_varified = models.BooleanField(default=False)
     email_verification_token = models.UUIDField(default=uuid.uuid4,unique=True,null=True,blank=True)
     address = models.TextField()
     state = models.ForeignKey(State,on_delete=models.SET_NULL,null=True, blank=True)
     district = models.ForeignKey(District,on_delete=models.SET_NULL,null=True, blank=True)
+    
+    def __str__(self):
+        return self.userName
+
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
