@@ -1,16 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <>
@@ -36,7 +27,7 @@ const Header = () => {
       </div>
 
       {/* Navbar */}
-      <div className={`container-fluid bg-white sticky-top ${isScrolled ? 'shadow-sm' : ''}`}>
+      <div className={`container-fluid bg-white sticky-top 'shadow-sm' : ''}`}>
         <div className="container">
           <nav className="navbar navbar-expand-lg bg-white navbar-light p-lg-0">
             <Link to="/" className="navbar-brand d-lg-none">
@@ -47,18 +38,19 @@ const Header = () => {
             </button>
             <div className="collapse navbar-collapse" id="navbarCollapse">
               <div className="navbar-nav">
-                <NavLink to="/" className={({isActive}) => `nav-item nav-link ${isActive ? 'active' : ''}`}>Home</NavLink>
-                <NavLink to="/about" className={({isActive}) => `nav-item nav-link ${isActive ? 'active' : ''}`}>About</NavLink>
-                <NavLink to="/services" className={({isActive}) => `nav-item nav-link ${isActive ? 'active' : ''}`}>Services</NavLink>
+                <Link to="/" className="nav-item nav-link">Home</Link>
+                <Link to="/about" className="nav-item nav-link">About</Link>
+                <Link to="/services" className="nav-item nav-link">Services</Link>
                 <div className="nav-item dropdown">
-                  <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+                  <span className="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</span>
                   <div className="dropdown-menu bg-light rounded-0 rounded-bottom m-0">
                     <Link to="/team" className="dropdown-item">Our Team</Link>
                     <Link to="/testimonials" className="dropdown-item">Testimonials</Link>
                     <Link to="/Appoinment" className="dropdown-item">Appointment</Link>
                   </div>
                 </div>
-                <NavLink to="/contact" className={({isActive}) => `nav-item nav-link ${isActive ? 'active' : ''}`}>Contact</NavLink>
+                <Link to="/contact" className="nav-item nav-link">Contact</Link>
+                <Link to="/register" className="nav-item nav-link">Register</Link>
               </div>
               <div className="ms-auto d-none d-lg-block">
                 <Link to="/quote" className="btn btn-primary py-2 px-3">Get A Quote</Link>

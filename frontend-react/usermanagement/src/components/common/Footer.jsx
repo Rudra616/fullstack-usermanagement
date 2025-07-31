@@ -14,11 +14,7 @@ const Footer = () => {
             <p className="mb-2"><i className="fa fa-phone-alt text-primary me-3"></i>+012 345 67890</p>
             <p className="mb-2"><i className="fa fa-envelope text-primary me-3"></i>info@example.com</p>
             <div className="d-flex pt-3">
-              {['twitter', 'facebook-f', 'youtube', 'linkedin-in'].map((icon) => (
-                <a key={icon} className="btn btn-square btn-light me-2" href="#">
-                  <i className={`fab fa-${icon}`}></i>
-                </a>
-              ))}
+
             </div>
           </div>
 

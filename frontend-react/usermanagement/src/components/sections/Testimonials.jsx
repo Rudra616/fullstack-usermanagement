@@ -60,9 +60,6 @@ const Testimonials = () => {
                       <img className="img-fluid" src={`/img/${testimonial.image}`} alt={testimonial.name} />
                       <div className="ms-3">
                         <div className="mb-2">
-                          {[...Array(5)].map((_, i) => (
-                            <i key={i} className="far fa-star text-primary"></i>
-                          ))}
                         </div>
                         <h5 className="text-uppercase">{testimonial.name}</h5>
                         <span>{testimonial.position}</span>

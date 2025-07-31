@@ -60,7 +60,6 @@ const Team = () => {
       </div>
     </div>
 
-    <h2>helo</h2>
     </>
   );
 };
