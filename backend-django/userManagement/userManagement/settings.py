@@ -42,9 +42,10 @@ INSTALLED_APPS = [
     "app",
     "rest_framework",
     "corsheaders",
-
+    "rest_framework_simplejwt",
 ]
 
+AUTH_USER_MODEL = 'app.User'
 
 
 MIDDLEWARE = [
@@ -143,4 +144,8 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',  # <-- this enables HTML view
     ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+
 }
