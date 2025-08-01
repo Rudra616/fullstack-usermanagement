@@ -51,6 +51,7 @@ const Header = () => {
                 </div>
                 <Link to="/contact" className="nav-item nav-link">Contact</Link>
                 <Link to="/register" className="nav-item nav-link">Register</Link>
+                <Link to="/login" className="nav-iten nav-link">Login</Link>
               </div>
               <div className="ms-auto d-none d-lg-block">
                 <Link to="/quote" className="btn btn-primary py-2 px-3">Get A Quote</Link>
