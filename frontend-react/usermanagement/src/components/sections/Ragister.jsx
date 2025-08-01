@@ -2,28 +2,29 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const Ragister = () => {
-  const [firstname, newfirstname] = useState("");
-  const [lastname, newlastname] = useState("");
-  const [username, newusername] = useState("");
-  const [password, newpassword] = useState("");
-  const [email, newemail] = useState("");
-  const [number, newnumber] = useState("");
-  const [addres, newaddres] = useState("");
-  const [birth, newbirth] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [number, setNumber] = useState("");
+  const [address, setAddress] = useState("");
+  const [birth, setBirth] = useState("");
 
   const [states, setStates] = useState([]);
   const [districts, setDistricts] = useState([]);
 
   const [selectedState, setSelectedState] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [errors, seterror] = useState({});
-  const [loading, setloding] = useState(false);
-  const [success, setsuccess] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
   const formattedDate = birth
     ? new Date(birth).toISOString().split("T")[0]
     : null;
 
-  // Fetch all states on component mount
+  // Load states on mount
   useEffect(() => {
     axios
       .get("http://fullstakeusermanagement.local/states/")
@@ -35,7 +36,7 @@ const Ragister = () => {
       });
   }, []);
 
-  // Fetch districts whenever state changes
+  // Load districts on state change
   useEffect(() => {
     if (selectedState) {
       axios
@@ -51,50 +52,57 @@ const Ragister = () => {
     }
   }, [selectedState]);
 
+  // Hide success message after 3 seconds
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => setSuccess(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
   const HandleRegisterForm = async (e) => {
     e.preventDefault();
-    setloding(true);
+    setLoading(true);
+
     const userdata = {
-      firstName: firstname.trim(),
-      lastName: lastname.trim(),
-      userName: username.trim(),
-      password: password.trim(),
+      first_name: firstname.trim(),
+      last_name: lastname.trim(),
+      username: username.trim(),
+      password: password,
       email: email.trim(),
       phoneNumber: parseInt(number) || null,
-      address: addres.trim(),
-      dateOfBirth: formattedDate,
+      address: address.trim(),
+      date_of_birth: formattedDate,
       state_id: selectedState || null,
       district_id: selectedDistrict || null,
     };
-
-    console.log("Sending:", userdata);
 
     try {
       const response = await axios.post(
         "http://fullstakeusermanagement.local/users/",
         userdata
       );
-      console.log("responsedata==>", response.data);
-      newfirstname("");
-      newlastname("");
-      newusername("");
-      newpassword("");
-      newemail("");
-      newnumber("");
-      newaddres("");
-      newbirth("");
+      console.log("response data ==>", response.data);
+
+      // Reset form
+      setFirstname("");
+      setLastname("");
+      setUsername("");
+      setPassword("");
+      setEmail("");
+      setNumber("");
+      setAddress("");
+      setBirth("");
       setSelectedState("");
       setSelectedDistrict("");
-      setDistricts([]); // clear district list
-      seterror({});
-      // Show success
-      setsuccess(true);
+      setDistricts([]);
+      setErrors({});
+      setSuccess(true);
     } catch (error) {
-      seterror(error.response.data);
-      console.log("registration error", error);
-      console.log("server response:", error.response?.data);
+      setErrors(error.response?.data || {});
+      console.log("Registration error", error);
     } finally {
-      setloding(false);
+      setLoading(false);
     }
   };
 
@@ -108,17 +116,17 @@ const Ragister = () => {
             left: 0,
             width: "100vw",
             height: "100vh",
-            backgroundColor: "rgba(255, 255, 255, 0.4)",
+            backgroundColor: "rgba(255, 255, 255, 0.5)",
             zIndex: 9999,
             cursor: "not-allowed",
           }}
         ></div>
       )}
 
-      <div className="container">
+      <div className="container mt-5">
         <div className="row justify-content-center">
-          <div className="col-md-6 bg-light p-4 rounded">
-            <h3>Create an account</h3>
+          <div className="col-md-6 bg-light p-4 rounded shadow">
+            <h3 className="text-center mb-4">Create an Account</h3>
             <form onSubmit={HandleRegisterForm}>
               <div className="mb-3">
                 <input
@@ -126,86 +134,78 @@ const Ragister = () => {
                   className="form-control"
                   placeholder="First Name"
                   value={firstname}
-                  onChange={(e) => newfirstname(e.target.value)}
+                  onChange={(e) => setFirstname(e.target.value)}
                 />
-                <small>
-                  <div style={{ color: "red" }}>{errors.firstName}</div>
-                </small>
+                <small className="text-danger">{errors.first_name}</small>
               </div>
+
               <div className="mb-3">
                 <input
                   type="text"
                   className="form-control"
                   placeholder="Last Name"
                   value={lastname}
-                  onChange={(e) => newlastname(e.target.value)}
+                  onChange={(e) => setLastname(e.target.value)}
                 />
-                <small>
-                  <div style={{ color: "red" }}>{errors.lastName}</div>
-                </small>
+                <small className="text-danger">{errors.last_name}</small>
               </div>
+
               <div className="mb-3">
                 <input
                   type="text"
                   className="form-control"
                   placeholder="Username"
                   value={username}
-                  onChange={(e) => newusername(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
-                <small>
-                  <div style={{ color: "red" }}>{errors.userName}</div>
-                </small>
+                <small className="text-danger">{errors.username}</small>
               </div>
+
               <div className="mb-3">
                 <input
                   type="password"
                   className="form-control"
                   placeholder="Password"
                   value={password}
-                  onChange={(e) => newpassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
-                <small>
-                  <div style={{ color: "red" }}>{errors.password}</div>
-                </small>
+                <small className="text-danger">{errors.password}</small>
               </div>
+
               <div className="mb-3">
                 <input
                   type="email"
                   className="form-control"
                   placeholder="Email"
                   value={email}
-                  onChange={(e) => newemail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-                <small>
-                  <div style={{ color: "red" }}>{errors.email}</div>
-                </small>
+                <small className="text-danger">{errors.email}</small>
               </div>
+
               <div className="mb-3">
                 <input
                   type="number"
                   className="form-control"
                   placeholder="Phone Number"
                   value={number}
-                  onChange={(e) => newnumber(e.target.value)}
+                  onChange={(e) => setNumber(e.target.value)}
                 />
-                <small>
-                  <div style={{ color: "red" }}>{errors.phoneNumber}</div>
-                </small>
+                <small className="text-danger">{errors.phoneNumber}</small>
               </div>
+
               <div className="mb-3">
                 <input
                   type="text"
                   className="form-control"
                   placeholder="Address"
-                  value={addres}
-                  onChange={(e) => newaddres(e.target.value)}
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                 />
-                <small>
-                  <div style={{ color: "red" }}>{errors.address}</div>
-                </small>
+                <small className="text-danger">{errors.address}</small>
               </div>
+
               <div className="mb-3">
-                {/* State Dropdown */}
                 <select
                   className="form-control"
                   value={selectedState}
@@ -218,12 +218,10 @@ const Ragister = () => {
                     </option>
                   ))}
                 </select>
-                <small>
-                  <div style={{ color: "red" }}>{errors.state_id}</div>
-                </small>
+                <small className="text-danger">{errors.state_id}</small>
               </div>
+
               <div className="mb-3">
-                {/* District Dropdown */}
                 <select
                   className="form-control"
                   value={selectedDistrict}
@@ -237,33 +235,32 @@ const Ragister = () => {
                     </option>
                   ))}
                 </select>
-                <small>
-                  <div style={{ color: "red" }}>{errors.district_id}</div>
-                </small>
+                <small className="text-danger">{errors.district_id}</small>
               </div>
+
               <div className="mb-3">
                 <input
                   type="date"
                   className="form-control"
                   value={birth}
-                  onChange={(e) => newbirth(e.target.value)}
+                  onChange={(e) => setBirth(e.target.value)}
                 />
-                <small>
-                  <div style={{ color: "red" }}>{errors.dateOfBirth}</div>
-                </small>
+                <small className="text-danger">{errors.date_of_birth}</small>
               </div>
+
               {success && (
-                <div className="alert alert-success">
-                  Registration successfully
+                <div className="alert alert-success text-center">
+                  Registration successful!
                 </div>
               )}
+
               <button
                 type="submit"
                 className="btn btn-info w-100"
                 disabled={loading}
                 style={{ cursor: loading ? "not-allowed" : "pointer" }}
               >
-                {loading ? "Please wait..." : "Submit"}
+                {loading ? "Please wait..." : "Register"}
               </button>
             </form>
           </div>
