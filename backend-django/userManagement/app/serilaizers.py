@@ -21,6 +21,8 @@ class UserSerilaizer(serializers.ModelSerializer):
     district = DistrictSerializer(read_only=True)
     state_id = serializers.PrimaryKeyRelatedField(queryset=State.objects.all(), source='state', write_only=True)
     district_id = serializers.PrimaryKeyRelatedField(queryset=District.objects.all(), source='district', write_only=True)
+    dateOfBirth = serializers.DateField(format='%Y-%m-%d', input_formats=['%Y-%m-%d'])
+
 
     def create(self, validated_data):
         password = validated_data.pop('password')
