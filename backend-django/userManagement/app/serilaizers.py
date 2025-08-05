@@ -17,7 +17,7 @@ class UserSerilaizer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
     password = serializers.CharField(write_only=True, min_length=6, required=True)
-    phoneNumber = serializers.IntegerField(required=True,min_length=10,max_length=10)
+    phoneNumber = serializers.IntegerField(required=True)
     address = serializers.CharField(required=True)
 
     state = StateSerializer(read_only=True)
