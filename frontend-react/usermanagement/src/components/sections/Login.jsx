@@ -1,36 +1,43 @@
-import axios from 'axios';
-import React , {useState} from 'react'
-import {useNavigate} from 'react-router-dom'
+import axios from "axios";
+import React, { useState , useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../AuthProvider";
+
+
 const Login = () => {
   const [username, newusername] = useState("");
   const [password, newpassword] = useState("");
   const [loading, setloding] = useState(false);
-  // const [errors,seterror] = useState({})
-  const navigate = useNavigate()
-  const handleLogin = async (e) =>{
-    e.preventDefault()
-    setloding(true)
-    const userData = { 
-      username,
-      password
-    }
-    try{
-      const responce  = await axios.post('http://fullstakeusermanagement.local/token/',userData)
+  const [errors, seterror] = useState({});
+  const {isLoggedIn,setIsLoggedIn} = useContext(AuthContext)
+
+  const navigate = useNavigate();
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setloding(true);
+    const userData = {
+      username: username.trim(),
+      password: password,
+    };
+    try {
+      const responce = await axios.post(
+        "http://fullstakeusermanagement.local/token/",
+        userData
+      );
       newusername("");
       newpassword("");
-      localStorage.setItem('accessToken',responce.data.access)
-      localStorage.setItem('accessToken',responce.data.refresh)
-      console.log("login successfully")
-      navigate('/')
-    }catch(error){
-
-      // seterror(error.response.data);
+      localStorage.setItem("accessToken", responce.data.access);
+      localStorage.setItem("refreshToken", responce.data.refresh);
+      console.log("login successfully");
+      setIsLoggedIn(true)
+      navigate("/");
+    } catch (error) {
+      seterror(error.response.data);
       console.log("server response:", error.response?.data);
-      
-    }finally{
-      setloding(false)
+    } finally {
+      setloding(false);
     }
-  }
+  };
   return (
     <>
       {loading && (
@@ -53,7 +60,11 @@ const Login = () => {
           <div className="col-md-6 bg-light p-4 rounded">
             <h3 className="text-center">Login</h3>
             <form onSubmit={handleLogin}>
-    
+              {errors.detail && (
+                <div className="alert alert-danger text-center py-1">
+                  {errors.detail}
+                </div>
+              )}
               <div className="mb-3">
                 <input
                   type="text"
@@ -62,7 +73,7 @@ const Login = () => {
                   value={username}
                   onChange={(e) => newusername(e.target.value)}
                 />
-              {/* <small>{errors.username}</small> */}
+                <small>{errors.username}</small>
               </div>
               <div className="mb-3">
                 <input
@@ -72,9 +83,9 @@ const Login = () => {
                   value={password}
                   onChange={(e) => newpassword(e.target.value)}
                 />
-                {/* <small>{errors.password}</small> */}
+                <small>{errors.password}</small>
               </div>
-                   
+
               <button
                 type="submit"
                 className="btn btn-info w-100"
@@ -88,7 +99,7 @@ const Login = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

@@ -11,14 +11,16 @@ import Contact from './pages/Contact';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Register from './components/sections/Ragister'
 import Login from './components/sections/Login';
+import AuthProvider from './AuthProvider';
 
 function App() {
   return (
     <>
+    <AuthProvider>
     <Router>
       <Header />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home />} / >
         <Route path="/about" element={<About />} />
         <Route path="/team" element={<Team />} />
         <Route path="/Appoinment" element={<AppoinmentForm />} />
@@ -30,7 +32,7 @@ function App() {
       </Routes>
       <Footer />
     </Router>
-
+    </AuthProvider>
     </>
   );
 }
