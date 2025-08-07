@@ -16,7 +16,7 @@ class UserSerilaizer(serializers.ModelSerializer):
     last_name = serializers.CharField(required=True)
     username = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
-    password = serializers.CharField(write_only=True, min_length=6, required=True)
+    password = serializers.CharField(write_only=True, min_length=6, required=False)
     phoneNumber = serializers.IntegerField(required=True)
     address = serializers.CharField(required=True)
 
@@ -41,7 +41,7 @@ class UserSerilaizer(serializers.ModelSerializer):
     date_of_birth = serializers.DateField(
         format='%Y-%m-%d',
         input_formats=['%Y-%m-%d'],
-        required=False  # change to True if you want to make it required
+        required=False
     )
 
     class Meta:
@@ -49,16 +49,12 @@ class UserSerilaizer(serializers.ModelSerializer):
         fields = [
             'first_name', 'last_name', 'username', 'password', 'phoneNumber',
             'email', 'address', 'state', 'district', 'state_id', 'district_id',
-            'date_of_birth', 'email_verification_token'
+            'date_of_birth', 'email_verification_token','role'
         ]
 
-    # def validate_email(self, value):
-    #     if User.objects.filter(email=value).exists():
-    #         raise serializers.ValidationError("Email already exists.")
-    #     return value
-
     def validate_username(self, value):
-        if User.objects.filter(username=value).exists():
+        user = self.context['request'].user
+        if User.objects.exclude(pk=user.pk).filter(username=value).exists():
             raise serializers.ValidationError("Username already exists.")
         return value
 
@@ -69,3 +65,14 @@ class UserSerilaizer(serializers.ModelSerializer):
         user.save()
         user.refresh_from_db()
         return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if password:
+            instance.set_password(password)
+
+        instance.save()
+        return instance

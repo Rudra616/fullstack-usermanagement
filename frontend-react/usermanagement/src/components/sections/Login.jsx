@@ -1,43 +1,89 @@
 import axios from "axios";
-import React, { useState , useContext } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
 
+// Create axios instance with interceptors
+const axiosWithRefresh = axios.create({
+  baseURL: "http://fullstakeusermanagement.local/",
+});
+
+// Add response interceptor for token refresh
+axiosWithRefresh.interceptors.response.use(
+  response => response,
+  async error => {
+    const originalRequest = error.config;
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      try {
+        const refreshToken = localStorage.getItem("refreshToken");
+        const response = await axios.post(
+          "http://fullstakeusermanagement.local/token/refresh/",
+          { refresh: refreshToken }
+        );
+        
+        localStorage.setItem("accessToken", response.data.access);
+        originalRequest.headers.Authorization = `Bearer ${response.data.access}`;
+        return axiosWithRefresh(originalRequest);
+      } catch (refreshError) {
+        console.error("Token refresh failed:", refreshError);
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("userRole");
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
 
 const Login = () => {
-  const [username, newusername] = useState("");
-  const [password, newpassword] = useState("");
-  const [loading, setloding] = useState(false);
-  const [errors, seterror] = useState({});
-  const {isLoggedIn,setIsLoggedIn} = useContext(AuthContext)
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const { setIsLoggedIn, setUserRole } = useContext(AuthContext);
 
   const navigate = useNavigate();
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    setloding(true);
-    const userData = {
-      username: username.trim(),
-      password: password,
-    };
+    setLoading(true);
+    setErrors({});
+
     try {
-      const responce = await axios.post(
+      const response = await axios.post(
         "http://fullstakeusermanagement.local/token/",
-        userData
+        {
+          username: username.trim(),
+          password: password,
+        }
       );
-      newusername("");
-      newpassword("");
-      localStorage.setItem("accessToken", responce.data.access);
-      localStorage.setItem("refreshToken", responce.data.refresh);
-      console.log("login successfully");
-      setIsLoggedIn(true)
+
+      localStorage.setItem("accessToken", response.data.access);
+      localStorage.setItem("refreshToken", response.data.refresh);
+
+      // Use the axiosWithRefresh instance for subsequent requests
+      const profileRes = await axiosWithRefresh.get("users/me/");
+      const role = profileRes.data.role;
+      
+      localStorage.setItem("userRole", role);
+      setUserRole(role);
+      setIsLoggedIn(true);
+      
       navigate("/");
     } catch (error) {
-      seterror(error.response.data);
-      console.log("server response:", error.response?.data);
+      setErrors(error.response?.data || {});
+      console.error("Login error:", error);
     } finally {
-      setloding(false);
+      setLoading(false);
     }
   };
+
   return (
     <>
       {loading && (
@@ -71,7 +117,7 @@ const Login = () => {
                   className="form-control"
                   placeholder="Username"
                   value={username}
-                  onChange={(e) => newusername(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
                 <small>{errors.username}</small>
               </div>
@@ -81,7 +127,7 @@ const Login = () => {
                   className="form-control"
                   placeholder="Password"
                   value={password}
-                  onChange={(e) => newpassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <small>{errors.password}</small>
               </div>

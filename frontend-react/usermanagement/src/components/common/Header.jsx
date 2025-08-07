@@ -3,12 +3,16 @@ import { Link,useNavigate } from "react-router-dom";
 import { AuthContext } from "../../AuthProvider";
 
 const Header = () => {
-  const { isLoggedIn, setIsLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, setIsLoggedIn ,userRole } = useContext(AuthContext);
+  console.log("✅ Header: userRole =", userRole);
+
   const navigate = useNavigate();
 
   const handleLogout = () =>{
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
+    localStorage.removeItem('userRole')
+
     setIsLoggedIn(false)
     console.log('logged out')
     navigate('/')
@@ -110,7 +114,14 @@ const Header = () => {
                   Contact
                 </Link>
                 {isLoggedIn ? (
-                  <button className="nav-iten nav-link" onClick={handleLogout}>logout</button>
+                  <>
+                      <Link to="/profile" className="nav-item nav-link">
+      Update Profile
+    </Link>
+    <button className="nav-item nav-link btn btn-link text-start" onClick={handleLogout}>
+      Logout
+    </button>
+  </>
                 ) : (
                   <>
                     <Link to="/register" className="nav-item nav-link">
@@ -122,6 +133,11 @@ const Header = () => {
                   </>
                 )}
               </div>
+              {isLoggedIn && userRole === 'admin' && (
+  <Link to="/adminDeshbord" className="nav-item nav-link">
+    Admin Dashboard
+  </Link>
+)}
               <div className="ms-auto d-none d-lg-block">
                 <Link to="/quote" className="btn btn-primary py-2 px-3">
                   Get A Quote

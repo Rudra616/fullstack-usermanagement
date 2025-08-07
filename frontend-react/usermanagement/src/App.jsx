@@ -12,6 +12,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Register from './components/sections/Ragister'
 import Login from './components/sections/Login';
 import AuthProvider from './AuthProvider';
+import ProfileUpdate from './components/sections/ProfileUpdate';
+import NotFound from './pages/NotFound';
+import AdminDeshbord from './components/sections/AdminDeshbord';
+
 
 function App() {
   return (
@@ -20,7 +24,7 @@ function App() {
     <Router>
       <Header />
       <Routes>
-        <Route path="/" element={<Home />} / >
+        <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/team" element={<Team />} />
         <Route path="/Appoinment" element={<AppoinmentForm />} />
@@ -29,6 +33,10 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<ProfileUpdate />} />
+        <Route path="/adminDeshbord" element={<AdminDeshbord />} />
+        <Route path="*" element={<NotFound />} />
+
       </Routes>
       <Footer />
     </Router>
